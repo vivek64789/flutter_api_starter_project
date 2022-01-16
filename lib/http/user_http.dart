@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:project_api/model/user.dart';
 
@@ -24,13 +23,18 @@ class HttpConnectUser {
 class HttpConnect {
   static Future<Map<String, dynamic>> post(
       String url, Map<String, dynamic> body) async {
-    final http.Response response = await http.post(
-      Uri.parse(HttpConnectUser._baseUrl + url),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(body),
-    );
-    return jsonDecode(response.body);
+    http.Response? response;
+    try {
+      response = await http.post(
+        Uri.parse(HttpConnectUser._baseUrl + url),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(body),
+      );
+    } catch (err) {
+      print(err);
+    }
+    return jsonDecode(response!.body);
   }
 }
