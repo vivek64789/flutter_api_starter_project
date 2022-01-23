@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:project_api/http/user_http.dart';
+import 'package:project_api/model/user.dart';
 
 import 'login_screen.dart';
 
@@ -16,6 +18,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? _lname;
   String? _username;
   String? _password;
+  final HttpConnectUser _connectUser = HttpConnectUser();
+  bool _loading = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,16 +98,57 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const SizedBox(
                 height: 20,
               ),
-              ElevatedButton(
-                onPressed: () {},
-                child: const Text("Register"),
-              ),
+              _loading
+                  ? const CircularProgressIndicator()
+                  : ElevatedButton(
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          setState(() {
+                            _loading = true;
+                          });
+                          _formKey.currentState!.save();
+                          final _userData = User(
+                            fname: _fname,
+                            lname: _lname,
+                            username: _username,
+                            password: _password,
+                          );
+                          var response = await _connectUser.registerUser(
+                              _userData, 'register');
+                          if (response['success'] == true) {
+                            setState(() {
+                              _loading = false;
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Registered Successfully'),
+                              ),
+                            );
+                            Navigator.pushReplacementNamed(
+                                context, LoginScreen.routeName);
+                          } else {
+                            setState(() {
+                              _loading = false;
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Registration failed'),
+                              ),
+                            );
+                            print(response['message']);
+                          }
+                          ;
+                        }
+                      },
+                      child: const Text("Register"),
+                    ),
               Row(
                 children: [
                   const Text("Already an account?"),
                   TextButton(
                     onPressed: () {
-                      Navigator.of(context).restorablePushReplacementNamed(LoginScreen.routeName);
+                      Navigator.of(context).restorablePushReplacementNamed(
+                          LoginScreen.routeName);
                     },
                     child: const Text("Sign in"),
                   ),

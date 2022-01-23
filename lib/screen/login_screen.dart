@@ -68,6 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const Text("Don't have an account?"),
                   TextButton(
                     onPressed: () {
+                
                       Navigator.restorablePushReplacementNamed(
                           context, RegisterScreen.routeName);
                     },
